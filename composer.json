@@ -1,0 +1,22 @@
+{
+    "name": "whatwedo/swiss-zip",
+    "type": "symfony-bundle",
+    "description": "A Symfony bundle for Swiss Zip entity and behaviour",
+    "keywords": ["swisspost", "zip", "location"],
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Maurizio Monticelli",
+            "email": "maurizio@whatwedo.ch"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4" : {
+            "whatwedo\\SwissZip\\" : ""
+        }
+    }
+}
