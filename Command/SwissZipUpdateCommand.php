@@ -4,35 +4,43 @@ namespace whatwedo\SwissZip\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use whatwedo\SwissZip\Manager\SwissZipManager;
 
 class SwissZipUpdateCommand extends Command
 {
 
-    protected static $defaultName = 'swisszip:udpate';
+    const DELETE = 'delete';
+    const ONLINE = 'online';
+    protected static $defaultName = 'whatwedo:swisszip:update';
+    private SwissZipManager $swissZipManager;
 
 
+    public function __construct(string $name = null, ContainerInterface $container, SwissZipManager $swissZipManager)
+    {
+        parent::__construct($name);
+        $this->swissZipManager = $swissZipManager;
+    }
+
+    protected function configure()
+    {
+        $this->addOption(self::DELETE, 'd', InputOption::VALUE_NONE, 'delete all entries first');
+        $this->addOption(self::ONLINE, 'o', InputOption::VALUE_NONE, 'get data online, stead from local file');
+    }
 
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $updateReport = $this->swissZipManager->update($input->getOption(self::DELETE), $input->getOption(self::ONLINE));
 
-//        file_put_contents('plz_verzeichnis_v2.json', file_get_contents('https://swisspost.opendatasoft.com/api/records/1.0/search/?dataset=plz_verzeichnis_v2&q=&rows=10000'));
+        $output->writeln('data Location: ' . $updateReport->location);
+        $output->writeln('deleted: ' . $updateReport->deleted);
+        $output->writeln('inserted: ' . $updateReport->inserted);
+        $output->writeln('updated: ' . $updateReport->updated);
 
-        $dir = $this->container->get('kernel')->locateResource('@AcmeDemoBundle/Resource');
-        $json = json_decode(file_get_contents('plz_verzeichnis_v2.json'));
-
-
-
-
-        foreach ($json->records as $dataSet) {
-            if (isset($dataSet->fields->plz_coff) && $dataSet->fields->plz_coff = 'J') {
-                $o = 0;
-            }
-        }
-
-
-
+        return Command::SUCCESS;
     }
 
 

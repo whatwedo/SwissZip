@@ -1,0 +1,54 @@
+<?php
+
+namespace whatwedo\SwissZip\Entity;
+
+
+interface SwissZipInterface
+{
+    const PLZ_TYP_10 = 10;
+    const PLZ_TYP_20 = 20;
+    const PLZ_TYP_30 = 30;
+    const PLZ_TYP_40 = 40;
+    const PLZ_TYP_80 = 80;
+
+    const SPRACHCODE_1 = 1;
+    const SPRACHCODE_2 = 2;
+    const SPRACHCODE_3 = 3;
+
+
+    public function getId(): string;
+
+    public function setId(string $id): self;
+
+    public function getPostleitzahl(): string;
+
+    public function setPostleitzahl(string $postleitzahl): self;
+
+    public function getPlzZz(): string;
+
+    public function setPlzZz(string $postleitzahl): self;
+
+    public function getOrtbez18(): string;
+
+    public function setOrtbez18(string $ortbez18): self;
+
+    public function getOrtbez27(): string;
+
+    public function setOrtbez27(string $ortbez27): self;
+
+    public function getKanton(): string;
+
+    public function setKanton(string $kanton): self;
+
+    public function getSprachcode(): int;
+
+    public function setSprachcode(int $sprachcode): self;
+
+    public function getPlzTyp(): int;
+
+    public function setPlzTyp(int $plzTyp): self;
+
+    public function getValidFrom(): ?\DateTimeImmutable;
+
+    public function setValidFrom(?\DateTimeImmutable $validFrom): self;
+}

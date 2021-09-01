@@ -1,0 +1,13 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  whatwedo\SwissZip\Command\:
+    resource: '../../Command/*'
+    tags: ['console.command']
+
+  whatwedo\SwissZip\:
+    resource: '../../*'
+    exclude: '../../Tests'
