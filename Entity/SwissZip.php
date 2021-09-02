@@ -7,10 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 trait SwissZip
 {
     /**
-     * @ORM\Column(type="string", length=40, unique=true, nullable=false)
+     * @ORM\Column(type="integer", unique=true, nullable=false)
      * @ORM\Id
      */
-    protected string $id = '3';
+    protected int $onrp = 0;
 
     /**
      * @ORM\Column(type="string", length=4, nullable=false)
@@ -54,14 +54,14 @@ trait SwissZip
      */
     protected ?\DateTimeImmutable $validFrom = null;
 
-    public function getId(): string
+    public function getOnrp(): int
     {
-        return $this->id;
+        return $this->onrp;
     }
 
-    public function setId(string $id): self
+    public function setOnrp(int $onrp): self
     {
-        $this->id = $id;
+        $this->onrp = $onrp;
         return $this;
     }
 

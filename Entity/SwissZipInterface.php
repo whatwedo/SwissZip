@@ -16,9 +16,9 @@ interface SwissZipInterface
     const SPRACHCODE_3 = 3;
 
 
-    public function getId(): string;
+    public function getOnrp(): int;
 
-    public function setId(string $id): self;
+    public function setOnrp(int $id): self;
 
     public function getPostleitzahl(): string;
 

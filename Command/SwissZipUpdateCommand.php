@@ -14,6 +14,7 @@ class SwissZipUpdateCommand extends Command
 
     const DELETE = 'delete';
     const ONLINE = 'online';
+    const DRY_RUN = 'dry-run';
     protected static $defaultName = 'whatwedo:swisszip:update';
     private SwissZipManager $swissZipManager;
 
@@ -28,17 +29,28 @@ class SwissZipUpdateCommand extends Command
     {
         $this->addOption(self::DELETE, 'd', InputOption::VALUE_NONE, 'delete all entries first');
         $this->addOption(self::ONLINE, 'o', InputOption::VALUE_NONE, 'get data online, stead from local file');
+        $this->addOption(self::DRY_RUN, null, InputOption::VALUE_NONE, 'do not store things');
+
     }
 
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $updateReport = $this->swissZipManager->update($input->getOption(self::DELETE), $input->getOption(self::ONLINE));
+        $updateReport = $this->swissZipManager->update($input->getOption(self::DELETE), $input->getOption(self::ONLINE), $input->getOption(self::DRY_RUN));
+
+        if ($input->getOption(self::DRY_RUN)) {
+            $output->writeln('DRY-RUN DRY-RUN');
+        }
 
         $output->writeln('data Location: ' . $updateReport->location);
         $output->writeln('deleted: ' . $updateReport->deleted);
         $output->writeln('inserted: ' . $updateReport->inserted);
         $output->writeln('updated: ' . $updateReport->updated);
+        $output->writeln('skipped: ' . $updateReport->skipped);
+
+        foreach ($updateReport->getMessages() as $message) {
+            $output->writeln('message: ' . $message);
+        }
 
         return Command::SUCCESS;
     }

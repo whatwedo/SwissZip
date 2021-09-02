@@ -99,8 +99,6 @@ bin/console whatwedo:swisszip:update
 
 `EventSubscriber/SwissZipSubscriber.php`
 
-
-
 ```php
 namespace App\EventSubscriber;
 
@@ -121,16 +119,19 @@ class SwissZipSubscriber implements EventSubscriberInterface
 
 public function onDelete(Event $event)    {
         if ($event->getEntity()->isWhatwedoZip())  {
-            throw new \Exception('we stay here!');
+            $event->getUpdateReport()->addMessage('we do here!');
+            $event->setBlock(true);
         }
     }
     public function onCreate(Event $event)    {}
     public function onUpdate(Event $event)    {
         if ($event->getEntity()->getPostleitzahl() == '3011')  {
+            $event->getUpdateReport()->addMessage('yes, here we do!');
             $event->getEntity()->setWhatwedoZip(true);
         }
     }
     public function onPersist(Event $event)   {}
 }
 ```
+
 
