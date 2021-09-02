@@ -11,7 +11,7 @@ use whatwedo\SwissZip\Entity\SwissZipInterface;
  * @method SwissZipInterface[]    findAll()
  * @method SwissZipInterface[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-abstract class SwissZipRepository extends ServiceEntityRepository
+abstract class SwissZipRepository extends ServiceEntityRepository implements SwissZipRepositoryInterface
 {
     /**
      * @return array|SwissZipInterface[]
@@ -23,6 +23,7 @@ abstract class SwissZipRepository extends ServiceEntityRepository
             ->orderBy('swiss_zip.plzZz', 'asc')
             ->setParameter('zip', $zip)
             ->getQuery()
+            ->enableResultCache()
             ->getResult();
     }
 
@@ -41,7 +42,9 @@ abstract class SwissZipRepository extends ServiceEntityRepository
             ->setParameter('inputOrt', strtolower('%'.$input.'%'))
             ->setParameter('inputPlz', strtolower('%'.$input.'%'))
             ->getQuery()
-            ->getResult();
+            ->enableResultCache()
+            ->getResult()
+            ;
     }
 
 

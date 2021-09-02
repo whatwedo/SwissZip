@@ -4,7 +4,7 @@ namespace whatwedo\SwissZip\Manager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use whatwedo\SwissZip\Dto\UpdateReport;
+use whatwedo\SwissZip\Dto\UpdateReportDto;
 use whatwedo\SwissZip\Event\Event;
 use whatwedo\SwissZip\Repository\SwissZipRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -26,10 +26,12 @@ class SwissZipManager
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function update(bool $delete = false, bool $online = false, bool $dryRun = false): UpdateReport
+    public function update(bool $delete = false): UpdateReportDto
     {
+        $dryRun = false;
+        $online = true;
         $entityClass = $this->getSwissZipEntity();
-        $updateReport = new UpdateReport();
+        $updateReport = new UpdateReportDto();
         if ($delete) {
             $this->deleteEntities($updateReport, $dryRun);
         }
@@ -40,66 +42,68 @@ class SwissZipManager
 
         foreach ($zipData->records as $dataSet) {
             $isNew = false;
-            if (isset($dataSet->fields->plz_coff) && $dataSet->fields->plz_coff = 'J') {
-                /** @var SwissZipInterface $swissZip */
-                $swissZip = $this->swissZipRepository->find($dataSet->fields->onrp);
+            if (isset($dataSet->fields->plz_coff) && $dataSet->fields->plz_coff == 'J') {
+                continue;
+            }
+            /** @var SwissZipInterface $swissZip */
+            $swissZip = $this->swissZipRepository->find($dataSet->fields->onrp);
 
-                if (!$swissZip) {
-                    $swissZip = new $entityClass;
+            if (!$swissZip) {
+                $swissZip = new $entityClass;
 
-                    $event = new Event($swissZip, $updateReport);
-                    $this->eventDispatcher->dispatch(
-                        $event,
-                        Event::CREATE
-                    );
-
-                    if ($event->isBlocked()) {
-                        continue;
-                    }
-                    $isNew = true;
-                }
-
-                $swissZip->setOnrp($dataSet->fields->onrp);
-                $swissZip->setPostleitzahl($dataSet->fields->postleitzahl);
-                $swissZip->setPlzZz($dataSet->fields->plz_zz);
-                $swissZip->setOrtbez18($dataSet->fields->ortbez18);
-                $swissZip->setOrtbez27($dataSet->fields->ortbez27);
-                $swissZip->setKanton($dataSet->fields->kanton);
-                $swissZip->setPlzTyp($dataSet->fields->plz_typ);
-                $swissZip->setSprachcode($dataSet->fields->sprachcode);
-                $swissZip->setValidFrom(new \DateTimeImmutable($dataSet->fields->gilt_ab_dat));
-
-                $eventUpdate = new Event($swissZip, $updateReport);
+                $event = new Event($swissZip, $updateReport);
                 $this->eventDispatcher->dispatch(
-                    $eventUpdate,
-                    Event::UPDATE
+                    $event,
+                    Event::CREATE
                 );
 
-                if ($eventUpdate->isBlocked()) {
-                    $updateReport->skipped++;
+                if ($event->isBlocked()) {
                     continue;
                 }
+                $isNew = true;
+            }
 
-                if ($isNew) {
+            $swissZip->setOnrp($dataSet->fields->onrp);
+            $swissZip->setPostleitzahl($dataSet->fields->postleitzahl);
+            $swissZip->setPlzZz($dataSet->fields->plz_zz);
+            $swissZip->setOrtbez18($dataSet->fields->ortbez18);
+            $swissZip->setOrtbez27($dataSet->fields->ortbez27);
+            $swissZip->setKanton($dataSet->fields->kanton);
+            $swissZip->setPlzTyp($dataSet->fields->plz_typ);
+            $swissZip->setSprachcode($dataSet->fields->sprachcode);
+            $swissZip->setValidFrom(new \DateTimeImmutable($dataSet->fields->gilt_ab_dat));
 
-                    $eventPersist = new Event($swissZip, $updateReport);
-                    $this->eventDispatcher->dispatch(
-                        $eventPersist,
-                        Event::PERSIST
-                    );
-                    if ($eventPersist->isBlocked()) {
-                        continue;
-                    }
-                    if (!$dryRun) {
-                        $this->entityManager->persist($swissZip);
-                    }
+            $eventUpdate = new Event($swissZip, $updateReport);
+            $this->eventDispatcher->dispatch(
+                $eventUpdate,
+                Event::UPDATE
+            );
 
-                    $updateReport->inserted++;
-                } else {
-                    $updateReport->updated++;
+            if ($eventUpdate->isBlocked()) {
+                $updateReport->skipped++;
+                continue;
+            }
+
+            if ($isNew) {
+
+                $eventPersist = new Event($swissZip, $updateReport);
+                $this->eventDispatcher->dispatch(
+                    $eventPersist,
+                    Event::PERSIST
+                );
+                if ($eventPersist->isBlocked()) {
+                    continue;
                 }
+                if (!$dryRun) {
+                    $this->entityManager->persist($swissZip);
+                }
+
+                $updateReport->inserted++;
+            } else {
+                $updateReport->updated++;
             }
         }
+
 
         if (!$dryRun) {
             $this->entityManager->flush();
@@ -116,7 +120,7 @@ class SwissZipManager
     {
         $result = $this->swissZipRepository->findSuggested($input);
 
-        if ($result)  {
+        if ($result) {
             usort($result, function (SwissZipInterface $a, SwissZipInterface $b) use ($input) {
                 if (strtolower($b->getOrtbez27()) == strtolower($input)) {
                     return strcmp($a->getPostleitzahl(), $b->getPostleitzahl());
@@ -141,7 +145,8 @@ class SwissZipManager
     }
 
 
-    private function getSwissZipEntity(): string  {
+    private function getSwissZipEntity(): string
+    {
         $metas = $this->entityManager->getMetadataFactory()->getAllMetadata();
         foreach ($metas as $meta) {
             if (in_array(SwissZipInterface::class, class_implements($meta->getName()))) {
@@ -156,6 +161,10 @@ class SwissZipManager
      */
     private function getData(string $location): object
     {
+
+        // use yeild
+
+
         $contents = file_get_contents($location);
         $data = json_decode($contents);
 
@@ -179,11 +188,11 @@ class SwissZipManager
     }
 
     /**
-     * @param UpdateReport $updateReport
+     * @param UpdateReportDto $updateReport
      */
-    private function deleteEntities(UpdateReport $updateReport, bool $dryRun): void
+    private function deleteEntities(UpdateReportDto $updateReport, bool $dryRun): void
     {
-        foreach ($this->swissZipRepository->findAll() as $item) {
+        foreach ($this->swissZipRepository->createQueryBuilder()->getQuery()->toIterable() as $item) {
             $event = new Event($item, $updateReport);
             $this->eventDispatcher->dispatch(
                 $event,

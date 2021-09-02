@@ -2,7 +2,7 @@
 
 namespace whatwedo\SwissZip\Event;
 
-use whatwedo\SwissZip\Dto\UpdateReport;
+use whatwedo\SwissZip\Dto\UpdateReportDto;
 use whatwedo\SwissZip\Entity\SwissZipInterface;
 
 class Event
@@ -15,9 +15,9 @@ class Event
 
     private SwissZipInterface $entity;
     private bool $block = false;
-    private UpdateReport $updateReport;
+    private UpdateReportDto $updateReport;
 
-    public function __construct(SwissZipInterface $entity, UpdateReport $updateReport)
+    public function __construct(SwissZipInterface $entity, UpdateReportDto $updateReport)
     {
         $this->entity = $entity;
         $this->updateReport = $updateReport;
@@ -49,7 +49,7 @@ class Event
         return $this;
     }
 
-    public function getUpdateReport(): UpdateReport
+    public function getUpdateReport(): UpdateReportDto
     {
         return $this->updateReport;
     }

@@ -27,7 +27,7 @@ custom properties for your needs.
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use whatwedo\SwissZip\Entity\SwissZip;
+use whatwedo\SwissZip\Entity\SwissZipTrait;
 use whatwedo\SwissZip\Entity\SwissZipInterface;
 
 /**
@@ -35,7 +35,7 @@ use whatwedo\SwissZip\Entity\SwissZipInterface;
  */
 class Location implements SwissZipInterface
 {
-    use SwissZip;
+    use SwissZipTrait;
     
     // Add some custom properties
     // Add some project properties

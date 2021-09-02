@@ -4,7 +4,7 @@ namespace whatwedo\SwissZip\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-trait SwissZip
+trait SwissZipTrait
 {
     /**
      * @ORM\Column(type="integer", unique=true, nullable=false)

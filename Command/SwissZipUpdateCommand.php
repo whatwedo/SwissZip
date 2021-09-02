@@ -6,7 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use whatwedo\SwissZip\Manager\SwissZipManager;
 
 class SwissZipUpdateCommand extends Command
@@ -19,7 +19,7 @@ class SwissZipUpdateCommand extends Command
     private SwissZipManager $swissZipManager;
 
 
-    public function __construct(string $name = null, ContainerInterface $container, SwissZipManager $swissZipManager)
+    public function __construct(string $name = null, SwissZipManager $swissZipManager)
     {
         parent::__construct($name);
         $this->swissZipManager = $swissZipManager;
@@ -28,7 +28,6 @@ class SwissZipUpdateCommand extends Command
     protected function configure()
     {
         $this->addOption(self::DELETE, 'd', InputOption::VALUE_NONE, 'delete all entries first');
-        $this->addOption(self::ONLINE, 'o', InputOption::VALUE_NONE, 'get data online, stead from local file');
         $this->addOption(self::DRY_RUN, null, InputOption::VALUE_NONE, 'do not store things');
 
     }
@@ -36,7 +35,14 @@ class SwissZipUpdateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $updateReport = $this->swissZipManager->update($input->getOption(self::DELETE), $input->getOption(self::ONLINE), $input->getOption(self::DRY_RUN));
+
+
+        // use IO
+        $io = new SymfonyStyle($input, $output);
+
+        dry-run transaction start
+        $updateReport = $this->swissZipManager->update($input->getOption(self::DELETE));
+        dry-run transaction rollback
 
         if ($input->getOption(self::DRY_RUN)) {
             $output->writeln('DRY-RUN DRY-RUN');

@@ -2,7 +2,7 @@
 
 namespace whatwedo\SwissZip\Dto;
 
-class UpdateReport
+class UpdateReportDto
 {
 
     public int $updated = 0;

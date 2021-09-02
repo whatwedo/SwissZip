@@ -15,40 +15,21 @@ interface SwissZipInterface
     const SPRACHCODE_2 = 2;
     const SPRACHCODE_3 = 3;
 
-
-    public function getOnrp(): int;
-
     public function setOnrp(int $id): self;
-
-    public function getPostleitzahl(): string;
 
     public function setPostleitzahl(string $postleitzahl): self;
 
-    public function getPlzZz(): string;
-
     public function setPlzZz(string $postleitzahl): self;
-
-    public function getOrtbez18(): string;
 
     public function setOrtbez18(string $ortbez18): self;
 
-    public function getOrtbez27(): string;
-
     public function setOrtbez27(string $ortbez27): self;
-
-    public function getKanton(): string;
 
     public function setKanton(string $kanton): self;
 
-    public function getSprachcode(): int;
-
     public function setSprachcode(int $sprachcode): self;
 
-    public function getPlzTyp(): int;
-
     public function setPlzTyp(int $plzTyp): self;
-
-    public function getValidFrom(): ?\DateTimeImmutable;
 
     public function setValidFrom(?\DateTimeImmutable $validFrom): self;
 }
