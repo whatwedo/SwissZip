@@ -34,7 +34,7 @@ class SwissZipManager
             $this->deleteEntities($updateReport, $dryRun);
         }
 
-        $dataLocation = $this->getLocation($online);
+        $dataLocation = $this->getDataLocation($online);
         $updateReport->location = $dataLocation;
         $zipData = $this->getData($dataLocation);
 
@@ -148,7 +148,7 @@ class SwissZipManager
                 return $meta->getName();
             }
         }
-        throw new \Exception('no Entity implents the interface SwissZipInterface');
+        throw new \Exception('no Entity implements the interface SwissZipInterface');
     }
 
     /**
@@ -156,7 +156,9 @@ class SwissZipManager
      */
     private function getData(string $location): object
     {
-        $data = json_decode(file_get_contents($location));
+        $contents = file_get_contents($location);
+        $data = json_decode($contents);
+
         return $data;
     }
 
@@ -164,7 +166,7 @@ class SwissZipManager
      * @param bool $online
      * @return string
      */
-    private function getLocation(bool $online): string
+    public function getDataLocation(bool $online): string
     {
         if ($online) {
             $location = 'https://swisspost.opendatasoft.com/api/records/1.0/search/?dataset=plz_verzeichnis_v2&q=&rows=10000';
