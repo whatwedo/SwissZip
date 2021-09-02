@@ -17,6 +17,10 @@ require whatwedo/swiss-zip
 
 ### create your entity
 
+Create a new entity on your project. `use SwissZip` for implementing the `SwissZipInterface`. Add
+custom properties for your needs.
+
+
 `Entity/Location.php`
 
 ```php
@@ -32,6 +36,9 @@ use whatwedo\SwissZip\Entity\SwissZipInterface;
 class Location implements SwissZipInterface
 {
     use SwissZip;
+    
+    // Add some custom properties
+    // Add some project properties
     
     /**
      * @ORM\Column(type="boolean")
