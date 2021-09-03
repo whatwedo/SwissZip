@@ -34,17 +34,11 @@ class SwissZipManager
             $this->deleteEntities($updateReport);
         }
 
-        $dataLocation = $this->getDataLocation();
-        $updateReport->location = $dataLocation;
-        $zipData = $this->getData($dataLocation);
 
-        foreach ($zipData->records as $dataSet) {
+        foreach ($this->getData() as $dataSet) {
             $isNew = false;
-            if (!isset($dataSet->fields->plz_coff)) {
-                continue;
-            }
             /** @var SwissZipInterface $swissZip */
-            $swissZip = $this->swissZipRepository->find($dataSet->fields->onrp);
+            $swissZip = $this->swissZipRepository->find($dataSet->onrp);
 
             if (!$swissZip) {
                 $swissZip = new $entityClass;
@@ -61,15 +55,15 @@ class SwissZipManager
                 $isNew = true;
             }
 
-            $swissZip->setOnrp($dataSet->fields->onrp);
-            $swissZip->setPostleitzahl($dataSet->fields->postleitzahl);
-            $swissZip->setPlzZz($dataSet->fields->plz_zz);
-            $swissZip->setOrtbez18($dataSet->fields->ortbez18);
-            $swissZip->setOrtbez27($dataSet->fields->ortbez27);
-            $swissZip->setKanton($dataSet->fields->kanton);
-            $swissZip->setPlzTyp($dataSet->fields->plz_typ);
-            $swissZip->setSprachcode($dataSet->fields->sprachcode);
-            $swissZip->setValidFrom(new \DateTimeImmutable($dataSet->fields->gilt_ab_dat));
+            $swissZip->setOnrp($dataSet->onrp);
+            $swissZip->setPostleitzahl($dataSet->postleitzahl);
+            $swissZip->setPlzZz($dataSet->plz_zz);
+            $swissZip->setOrtbez18($dataSet->ortbez18);
+            $swissZip->setOrtbez27($dataSet->ortbez27);
+            $swissZip->setKanton($dataSet->kanton);
+            $swissZip->setPlzTyp($dataSet->plz_typ);
+            $swissZip->setSprachcode($dataSet->sprachcode);
+            $swissZip->setValidFrom(new \DateTimeImmutable($dataSet->gilt_ab_dat));
 
             $eventUpdate = new Event($swissZip, $updateReport);
             $this->eventDispatcher->dispatch(
@@ -153,23 +147,36 @@ class SwissZipManager
     /**
      * @return mixed
      */
-    private function getData(string $location): object
+    private function getData(): \Generator
     {
+        $results = [];
 
-        // use yeild
+        $row = 1000;
+        $start = 0;
+
+        do {
+            $location = sprintf('https://swisspost.opendatasoft.com/api/records/1.0/search/?dataset=plz_verzeichnis_v2&q=&rows=%s&start=%s',
+                $row,
+                $row * $start
+            );
+            $contents = file_get_contents($location);
+            $zipData = json_decode($contents);
+
+            foreach ($zipData->records as $dataSet) {
+                $isNew = false;
+                if (!isset($dataSet->fields->plz_coff)) {
+                    continue;
+                }
+                yield $dataSet->fields;
+            }
 
 
-        $contents = file_get_contents($location);
-        $data = json_decode($contents);
+            $start++;
+        } while (count($zipData->records) != 0);
 
-        return $data;
+        return $results;
     }
 
-    public function getDataLocation(): string
-    {
-        $location = 'https://swisspost.opendatasoft.com/api/records/1.0/search/?dataset=plz_verzeichnis_v2&q=&rows=10000';
-        return $location;
-    }
 
     /**
      * @param UpdateReportDto $updateReport
