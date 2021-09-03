@@ -3,9 +3,12 @@
 namespace whatwedo\SwissZip\Manager;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use whatwedo\SwissZip\Dto\UpdateReportDto;
-use whatwedo\SwissZip\Event\Event;
+use whatwedo\SwissZip\Event\CreateEvent;
+use whatwedo\SwissZip\Event\DeleteEvent;
+use whatwedo\SwissZip\Event\UpdateEvent;
 use whatwedo\SwissZip\Repository\SwissZipRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use whatwedo\SwissZip\Entity\SwissZipInterface;
@@ -53,13 +56,10 @@ class SwissZipManager
             if (!$swissZip) {
                 $swissZip = new $entityClass;
 
-                $event = new Event($swissZip, $updateReport);
-                $this->eventDispatcher->dispatch(
-                    $event,
-                    Event::CREATE
-                );
+                $createEvent = new CreateEvent($swissZip, $updateReport);
+                $this->eventDispatcher->dispatch($createEvent, CreateEvent::class);
 
-                if ($event->isBlocked()) {
+                if ($createEvent->isBlocked()) {
                     continue;
                 }
                 $isNew = true;
@@ -75,27 +75,15 @@ class SwissZipManager
             $swissZip->setSprachcode($dataSet->sprachcode);
             $swissZip->setValidFrom(new \DateTimeImmutable($dataSet->gilt_ab_dat));
 
-            $eventUpdate = new Event($swissZip, $updateReport);
-            $this->eventDispatcher->dispatch(
-                $eventUpdate,
-                Event::UPDATE
-            );
+            $updateEvent = new UpdateEvent($swissZip, $updateReport);
+            $this->eventDispatcher->dispatch($updateEvent, UpdateEvent::class);
 
-            if ($eventUpdate->isBlocked()) {
+            if ($updateEvent->isBlocked()) {
                 $updateReport->skipped++;
                 continue;
             }
 
             if ($isNew) {
-
-                $eventPersist = new Event($swissZip, $updateReport);
-                $this->eventDispatcher->dispatch(
-                    $eventPersist,
-                    Event::PERSIST
-                );
-                if ($eventPersist->isBlocked()) {
-                    continue;
-                }
                 $this->entityManager->persist($swissZip);
 
                 $updateReport->inserted++;
@@ -109,6 +97,7 @@ class SwissZipManager
 
         return $updateReport;
     }
+   
 
     private function getSwissZipEntity(): string
     {
@@ -163,20 +152,14 @@ class SwissZipManager
         $dql = sprintf('select s from %s s', $this->getSwissZipEntity());
         $query = $this->entityManager->createQuery($dql);
         foreach ($query->toIterable() as $item) {
-
-            $event = new Event($item, $updateReport);
-            $this->eventDispatcher->dispatch(
-                $event,
-                Event::DELETE
-            );
-            if ($event->isBlocked()) {
+            $deleteEvent = new DeleteEvent($item, $updateReport);
+            $this->eventDispatcher->dispatch($deleteEvent, DeleteEvent::class);
+            if ($deleteEvent->isBlocked()) {
                 $updateReport->skipped++;
                 continue;
             }
 
-
             $this->entityManager->remove($item);
-
 
             $updateReport->deleted++;
         }
