@@ -10,7 +10,7 @@ use whatwedo\SwissZip\Repository\SwissZipRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use whatwedo\SwissZip\Entity\SwissZipInterface;
 
-class SwissZipManager
+class SwissZipUpdateManager
 {
     private KernelInterface $kernel;
     private SwissZipRepository $swissZipRepository;
@@ -99,39 +99,6 @@ class SwissZipManager
 
         return $updateReport;
     }
-
-
-    /**
-     * @return SwissZipInterface[]
-     */
-    public function suggest(string $input): array
-    {
-        $result = $this->swissZipRepository->findSuggested($input);
-
-        if ($result) {
-            usort($result, function (SwissZipInterface $a, SwissZipInterface $b) use ($input) {
-                if (strtolower($b->getOrtbez27()) == strtolower($input)) {
-                    return strcmp($a->getPostleitzahl(), $b->getPostleitzahl());
-                }
-
-                return strcmp($a->getOrtbez27(), $b->getOrtbez27());
-            });
-        }
-
-        return $result ? $result : [];
-    }
-
-
-    /**
-     * @return SwissZipInterface[]
-     */
-    public function find(string $zip): array
-    {
-        $result = $this->swissZipRepository->findByZip($zip);
-
-        return $result ? $result : [];
-    }
-
 
     private function getSwissZipEntity(): string
     {
