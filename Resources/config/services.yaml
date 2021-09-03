@@ -11,3 +11,7 @@ services:
   whatwedo\SwissZip\:
     resource: '../../*'
     exclude: '../../Tests'
+
+  whatwedo\SwissZip\EventListener\SwissZipTraitListener:
+    tags:
+      - { name: doctrine.event_listener, event: loadClassMetadata }
