@@ -13,7 +13,7 @@ use whatwedo\SwissZip\Repository\SwissZipRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use whatwedo\SwissZip\Entity\SwissZipInterface;
 
-class SwissZipManager
+class SwissZipUpdateManager
 {
     private KernelInterface $kernel;
     private SwissZipRepository $swissZipRepository;
