@@ -176,8 +176,10 @@ class SwissZipManager
      */
     private function deleteEntities(UpdateReportDto $updateReport): void
     {
-//        foreach ($this->swissZipRepository->createQueryBuilder()->getQuery()->toIterable() as $item) {
-        foreach ($this->swissZipRepository->findAll() as $item) {
+        $dql = sprintf('select s from %s s', $this->getSwissZipEntity());
+        $query = $this->entityManager->createQuery($dql);
+        foreach ($query->toIterable() as $item) {
+
             $event = new Event($item, $updateReport);
             $this->eventDispatcher->dispatch(
                 $event,
