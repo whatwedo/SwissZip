@@ -9,6 +9,7 @@ use whatwedo\SwissZip\Entity\SwissZipInterface;
 abstract class AbstractEvent extends GenericEvent
 {
     private bool $block = false;
+
     private UpdateReportDto $updateReport;
 
     public function __construct(SwissZipInterface $entity, UpdateReportDto $updateReport)
@@ -17,9 +18,6 @@ abstract class AbstractEvent extends GenericEvent
         $this->updateReport = $updateReport;
     }
 
-    /**
-     * @return SwissZipInterface
-     */
     public function getSubject(): SwissZipInterface
     {
         return parent::getSubject();
@@ -33,6 +31,7 @@ abstract class AbstractEvent extends GenericEvent
     public function setBlock(bool $block): self
     {
         $this->block = $block;
+
         return $this;
     }
 

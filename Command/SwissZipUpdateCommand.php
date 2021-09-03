@@ -12,13 +12,15 @@ use whatwedo\SwissZip\Manager\SwissZipUpdateManager;
 
 class SwissZipUpdateCommand extends Command
 {
+    public const DELETE = 'delete';
 
-    const DELETE = 'delete';
-    const DRY_RUN = 'dry-run';
+    public const DRY_RUN = 'dry-run';
+
     protected static $defaultName = 'whatwedo:swisszip:update';
-    private SwissZipUpdateManager $swissZipManager;
-    private EntityManagerInterface $entityManager;
 
+    private SwissZipUpdateManager $swissZipManager;
+
+    private EntityManagerInterface $entityManager;
 
     public function __construct(string $name = null, SwissZipUpdateManager $swissZipManager, EntityManagerInterface $entityManager)
     {
@@ -31,13 +33,10 @@ class SwissZipUpdateCommand extends Command
     {
         $this->addOption(self::DELETE, 'd', InputOption::VALUE_NONE, 'delete all entries first');
         $this->addOption(self::DRY_RUN, null, InputOption::VALUE_NONE, 'do not store things');
-
     }
-
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $io = new SymfonyStyle($input, $output);
 
         $this->entityManager->beginTransaction();
@@ -53,17 +52,16 @@ class SwissZipUpdateCommand extends Command
             $io->caution('DRY-RUN');
         }
 
-
         $io->horizontalTable([
             'deleted',
             'inserted',
             'updated',
-            'skipped'
+            'skipped',
         ], [
             [$updateReport->deleted,
-            $updateReport->inserted,
-            $updateReport->updated,
-            $updateReport->skipped]
+                $updateReport->inserted,
+                $updateReport->updated,
+                $updateReport->skipped, ],
         ]);
 
         if (count($updateReport->getMessages())) {
@@ -72,6 +70,4 @@ class SwissZipUpdateCommand extends Command
 
         return Command::SUCCESS;
     }
-
-
 }

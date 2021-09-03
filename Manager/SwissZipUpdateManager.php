@@ -3,21 +3,23 @@
 namespace whatwedo\SwissZip\Manager;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\EventDispatcher\GenericEvent;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use whatwedo\SwissZip\Dto\UpdateReportDto;
+use whatwedo\SwissZip\Entity\SwissZipInterface;
 use whatwedo\SwissZip\Event\CreateEvent;
 use whatwedo\SwissZip\Event\DeleteEvent;
 use whatwedo\SwissZip\Event\UpdateEvent;
 use whatwedo\SwissZip\Repository\SwissZipRepository;
-use Symfony\Component\HttpKernel\KernelInterface;
-use whatwedo\SwissZip\Entity\SwissZipInterface;
 
 class SwissZipUpdateManager
 {
     private KernelInterface $kernel;
+
     private SwissZipRepository $swissZipRepository;
+
     private EntityManagerInterface $entityManager;
+
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(KernelInterface $kernel, EntityManagerInterface $entityManager, EventDispatcherInterface $eventDispatcher)
@@ -47,14 +49,13 @@ class SwissZipUpdateManager
             $this->deleteEntities($updateReport);
         }
 
-
         foreach ($this->getData() as $dataSet) {
             $isNew = false;
             /** @var SwissZipInterface $swissZip */
             $swissZip = $this->swissZipRepository->find($dataSet->onrp);
 
-            if (!$swissZip) {
-                $swissZip = new $entityClass;
+            if (! $swissZip) {
+                $swissZip = new $entityClass();
 
                 $createEvent = new CreateEvent($swissZip, $updateReport);
                 $this->eventDispatcher->dispatch($createEvent, CreateEvent::class);
@@ -79,25 +80,22 @@ class SwissZipUpdateManager
             $this->eventDispatcher->dispatch($updateEvent, UpdateEvent::class);
 
             if ($updateEvent->isBlocked()) {
-                $updateReport->skipped++;
+                ++$updateReport->skipped;
                 continue;
             }
 
             if ($isNew) {
                 $this->entityManager->persist($swissZip);
-
-                $updateReport->inserted++;
+                ++$updateReport->inserted;
             } else {
-                $updateReport->updated++;
+                ++$updateReport->updated;
             }
         }
-
 
         $this->entityManager->flush();
 
         return $updateReport;
     }
-   
 
     private function getSwissZipEntity(): string
     {
@@ -117,11 +115,12 @@ class SwissZipUpdateManager
     {
         $results = [];
 
-        $row = 500;
+        $row = 200;
         $start = 0;
 
         do {
-            $location = sprintf('https://swisspost.opendatasoft.com/api/records/1.0/search/?dataset=plz_verzeichnis_v2&q=&rows=%s&start=%s',
+            $location = sprintf(
+                'https://swisspost.opendatasoft.com/api/records/1.0/search/?dataset=plz_verzeichnis_v2&q=&rows=%s&start=%s',
                 $row,
                 $row * $start
             );
@@ -130,23 +129,18 @@ class SwissZipUpdateManager
 
             foreach ($zipData->records as $dataSet) {
                 $isNew = false;
-                if (!isset($dataSet->fields->plz_coff)) {
+                if (! isset($dataSet->fields->plz_coff)) {
                     continue;
                 }
                 yield $dataSet->fields;
             }
 
-
-            $start++;
-        } while (count($zipData->records) != 0);
+            ++$start;
+        } while (0 != count($zipData->records));
 
         return $results;
     }
 
-
-    /**
-     * @param UpdateReportDto $updateReport
-     */
     private function deleteEntities(UpdateReportDto $updateReport): void
     {
         $dql = sprintf('select s from %s s', $this->getSwissZipEntity());
@@ -155,17 +149,15 @@ class SwissZipUpdateManager
             $deleteEvent = new DeleteEvent($item, $updateReport);
             $this->eventDispatcher->dispatch($deleteEvent, DeleteEvent::class);
             if ($deleteEvent->isBlocked()) {
-                $updateReport->skipped++;
+                ++$updateReport->skipped;
                 continue;
             }
 
             $this->entityManager->remove($item);
 
-            $updateReport->deleted++;
+            ++$updateReport->deleted;
         }
         $this->entityManager->flush();
         $this->entityManager->clear();
     }
-
-
 }

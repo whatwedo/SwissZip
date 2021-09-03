@@ -2,18 +2,23 @@
 
 namespace whatwedo\SwissZip\Entity;
 
-
 interface SwissZipInterface
 {
-    const PLZ_TYP_10 = 10;
-    const PLZ_TYP_20 = 20;
-    const PLZ_TYP_30 = 30;
-    const PLZ_TYP_40 = 40;
-    const PLZ_TYP_80 = 80;
+    public const PLZ_TYP_10 = 10;
 
-    const SPRACHCODE_1 = 1;
-    const SPRACHCODE_2 = 2;
-    const SPRACHCODE_3 = 3;
+    public const PLZ_TYP_20 = 20;
+
+    public const PLZ_TYP_30 = 30;
+
+    public const PLZ_TYP_40 = 40;
+
+    public const PLZ_TYP_80 = 80;
+
+    public const SPRACHCODE_1 = 1;
+
+    public const SPRACHCODE_2 = 2;
+
+    public const SPRACHCODE_3 = 3;
 
     public function setOnrp(int $id): self;
 
