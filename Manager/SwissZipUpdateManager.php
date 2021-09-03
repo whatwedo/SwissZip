@@ -47,7 +47,7 @@ class SwissZipUpdateManager
                 $swissZip = new $entityClass;
 
                 $createEvent = new CreateEvent($swissZip, $updateReport);
-                $this->eventDispatcher->dispatch($createEvent. 'swisszip.');
+                $this->eventDispatcher->dispatch($createEvent, CreateEvent::class);
 
                 if ($createEvent->isBlocked()) {
                     continue;
@@ -66,7 +66,7 @@ class SwissZipUpdateManager
             $swissZip->setValidFrom(new \DateTimeImmutable($dataSet->gilt_ab_dat));
 
             $updateEvent = new UpdateEvent($swissZip, $updateReport);
-            $this->eventDispatcher->dispatch($updateEvent);
+            $this->eventDispatcher->dispatch($updateEvent, UpdateEvent::class);
 
             if ($updateEvent->isBlocked()) {
                 $updateReport->skipped++;
@@ -87,6 +87,7 @@ class SwissZipUpdateManager
 
         return $updateReport;
     }
+   
 
     private function getSwissZipEntity(): string
     {
@@ -142,7 +143,7 @@ class SwissZipUpdateManager
         $query = $this->entityManager->createQuery($dql);
         foreach ($query->toIterable() as $item) {
             $deleteEvent = new DeleteEvent($item, $updateReport);
-            $this->eventDispatcher->dispatch($deleteEvent, 'swisszip.update.delete');
+            $this->eventDispatcher->dispatch($deleteEvent, DeleteEvent::class);
             if ($deleteEvent->isBlocked()) {
                 $updateReport->skipped++;
                 continue;

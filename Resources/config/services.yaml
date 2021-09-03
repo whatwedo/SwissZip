@@ -15,3 +15,7 @@ services:
   whatwedo\SwissZip\EventListener\SwissZipTraitListener:
     tags:
       - { name: doctrine.event_listener, event: loadClassMetadata }
+
+  whatwedo\SwissZip\Repository\SwissZipRepositoryInterface:
+    autowire: true
+    public: true
