@@ -117,7 +117,7 @@ class SwissZipUpdateManager
     {
         $results = [];
 
-        $row = 1000;
+        $row = 500;
         $start = 0;
 
         do {
