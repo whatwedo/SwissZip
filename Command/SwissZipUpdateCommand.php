@@ -14,7 +14,6 @@ class SwissZipUpdateCommand extends Command
 {
 
     const DELETE = 'delete';
-    const ONLINE = 'online';
     const DRY_RUN = 'dry-run';
     protected static $defaultName = 'whatwedo:swisszip:update';
     private SwissZipManager $swissZipManager;
