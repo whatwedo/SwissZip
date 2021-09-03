@@ -28,14 +28,13 @@ class SwissZipManager
 
     public function update(bool $delete = false): UpdateReportDto
     {
-        $online = true;
         $entityClass = $this->getSwissZipEntity();
         $updateReport = new UpdateReportDto();
         if ($delete) {
             $this->deleteEntities($updateReport);
         }
 
-        $dataLocation = $this->getDataLocation($online);
+        $dataLocation = $this->getDataLocation();
         $updateReport->location = $dataLocation;
         $zipData = $this->getData($dataLocation);
 
@@ -166,19 +165,9 @@ class SwissZipManager
         return $data;
     }
 
-    /**
-     * @param bool $online
-     * @return string
-     */
-    public function getDataLocation(bool $online): string
+    public function getDataLocation(): string
     {
-        if ($online) {
-            $location = 'https://swisspost.opendatasoft.com/api/records/1.0/search/?dataset=plz_verzeichnis_v2&q=&rows=10000';
-        } else {
-            $dir = $this->kernel->locateResource('@whatwedoSwissZipBundle/Resources/data');
-            $location = $dir . '/plz_verzeichnis_v2.json';
-
-        }
+        $location = 'https://swisspost.opendatasoft.com/api/records/1.0/search/?dataset=plz_verzeichnis_v2&q=&rows=10000';
         return $location;
     }
 
