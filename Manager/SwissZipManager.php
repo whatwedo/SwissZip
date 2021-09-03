@@ -10,7 +10,7 @@ use whatwedo\SwissZip\Repository\SwissZipRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use whatwedo\SwissZip\Entity\SwissZipInterface;
 
-class SwissZipUpdateManager
+class SwissZipManager
 {
     private KernelInterface $kernel;
     private SwissZipRepository $swissZipRepository;
@@ -24,6 +24,16 @@ class SwissZipUpdateManager
         $entityClass = $this->getSwissZipEntity();
         $this->swissZipRepository = $entityManager->getRepository($entityClass);
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    public function find(string $zip): array
+    {
+        return $this->swissZipRepository->findByZip($zip);
+    }
+
+    public function suggest(string $input): array
+    {
+        return $this->swissZipRepository->findSuggested($input);
     }
 
     public function update(bool $delete = false): UpdateReportDto

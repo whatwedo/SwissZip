@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use whatwedo\SwissZip\Manager\SwissZipUpdateManager;
+use whatwedo\SwissZip\Manager\SwissZipManager;
 
 class SwissZipUpdateCommand extends Command
 {
@@ -17,11 +17,11 @@ class SwissZipUpdateCommand extends Command
     const ONLINE = 'online';
     const DRY_RUN = 'dry-run';
     protected static $defaultName = 'whatwedo:swisszip:update';
-    private SwissZipUpdateManager $swissZipManager;
+    private SwissZipManager $swissZipManager;
     private EntityManagerInterface $entityManager;
 
 
-    public function __construct(string $name = null, SwissZipUpdateManager $swissZipManager, EntityManagerInterface $entityManager)
+    public function __construct(string $name = null, SwissZipManager $swissZipManager, EntityManagerInterface $entityManager)
     {
         parent::__construct($name);
         $this->swissZipManager = $swissZipManager;

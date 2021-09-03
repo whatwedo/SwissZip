@@ -2,8 +2,10 @@
 
 namespace whatwedo\Tests;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use whatwedo\SwissZip\Manager\SwissZipManager;
+use whatwedo\SwissZip\Repository\SwissZipRepository;
 
 class SwissZipTest extends KernelTestCase
 {
@@ -14,7 +16,6 @@ class SwissZipTest extends KernelTestCase
 
     public function testByExistingZip() {
 
-        /** @var SwissZipManager $manager */
         $manager = $this->getContainer()->get(\whatwedo\SwissZip\Manager\SwissZipManager::class);
 
         $locations = $manager->find('3011');
