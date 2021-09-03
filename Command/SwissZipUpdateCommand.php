@@ -2,6 +2,7 @@
 
 namespace whatwedo\SwissZip\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,12 +18,14 @@ class SwissZipUpdateCommand extends Command
     const DRY_RUN = 'dry-run';
     protected static $defaultName = 'whatwedo:swisszip:update';
     private SwissZipManager $swissZipManager;
+    private EntityManagerInterface $entityManager;
 
 
-    public function __construct(string $name = null, SwissZipManager $swissZipManager)
+    public function __construct(string $name = null, SwissZipManager $swissZipManager, EntityManagerInterface $entityManager)
     {
         parent::__construct($name);
         $this->swissZipManager = $swissZipManager;
+        $this->entityManager = $entityManager;
     }
 
     protected function configure()
@@ -36,26 +39,36 @@ class SwissZipUpdateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
-
-        // use IO
         $io = new SymfonyStyle($input, $output);
 
-        dry-run transaction start
-        $updateReport = $this->swissZipManager->update($input->getOption(self::DELETE));
-        dry-run transaction rollback
+        $this->entityManager->beginTransaction();
 
+        $updateReport = $this->swissZipManager->update($input->getOption(self::DELETE));
         if ($input->getOption(self::DRY_RUN)) {
-            $output->writeln('DRY-RUN DRY-RUN');
+            $this->entityManager->rollback();
+        } else {
+            $this->entityManager->commit();
         }
 
-        $output->writeln('data Location: ' . $updateReport->location);
-        $output->writeln('deleted: ' . $updateReport->deleted);
-        $output->writeln('inserted: ' . $updateReport->inserted);
-        $output->writeln('updated: ' . $updateReport->updated);
-        $output->writeln('skipped: ' . $updateReport->skipped);
+        if ($input->getOption(self::DRY_RUN)) {
+            $io->caution('DRY-RUN');
+        }
 
-        foreach ($updateReport->getMessages() as $message) {
-            $output->writeln('message: ' . $message);
+
+        $io->horizontalTable([
+            'deleted',
+            'inserted',
+            'updated',
+            'skipped'
+        ], [
+            [$updateReport->deleted,
+            $updateReport->inserted,
+            $updateReport->updated,
+            $updateReport->skipped]
+        ]);
+
+        if (count($updateReport->getMessages())) {
+            $io->note($updateReport->getMessages());
         }
 
         return Command::SUCCESS;

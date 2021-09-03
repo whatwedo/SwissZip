@@ -28,12 +28,11 @@ class SwissZipManager
 
     public function update(bool $delete = false): UpdateReportDto
     {
-        $dryRun = false;
         $online = true;
         $entityClass = $this->getSwissZipEntity();
         $updateReport = new UpdateReportDto();
         if ($delete) {
-            $this->deleteEntities($updateReport, $dryRun);
+            $this->deleteEntities($updateReport);
         }
 
         $dataLocation = $this->getDataLocation($online);
@@ -42,7 +41,7 @@ class SwissZipManager
 
         foreach ($zipData->records as $dataSet) {
             $isNew = false;
-            if (isset($dataSet->fields->plz_coff) && $dataSet->fields->plz_coff == 'J') {
+            if (!isset($dataSet->fields->plz_coff)) {
                 continue;
             }
             /** @var SwissZipInterface $swissZip */
@@ -94,9 +93,7 @@ class SwissZipManager
                 if ($eventPersist->isBlocked()) {
                     continue;
                 }
-                if (!$dryRun) {
-                    $this->entityManager->persist($swissZip);
-                }
+                $this->entityManager->persist($swissZip);
 
                 $updateReport->inserted++;
             } else {
@@ -105,9 +102,7 @@ class SwissZipManager
         }
 
 
-        if (!$dryRun) {
-            $this->entityManager->flush();
-        }
+        $this->entityManager->flush();
 
         return $updateReport;
     }
@@ -190,9 +185,10 @@ class SwissZipManager
     /**
      * @param UpdateReportDto $updateReport
      */
-    private function deleteEntities(UpdateReportDto $updateReport, bool $dryRun): void
+    private function deleteEntities(UpdateReportDto $updateReport): void
     {
-        foreach ($this->swissZipRepository->createQueryBuilder()->getQuery()->toIterable() as $item) {
+//        foreach ($this->swissZipRepository->createQueryBuilder()->getQuery()->toIterable() as $item) {
+        foreach ($this->swissZipRepository->findAll() as $item) {
             $event = new Event($item, $updateReport);
             $this->eventDispatcher->dispatch(
                 $event,
@@ -204,17 +200,13 @@ class SwissZipManager
             }
 
 
-            if (!$dryRun) {
-                $this->entityManager->remove($item);
-            }
+            $this->entityManager->remove($item);
 
 
             $updateReport->deleted++;
         }
-        if (!$dryRun) {
-            $this->entityManager->flush();
-            $this->entityManager->clear();
-        }
+        $this->entityManager->flush();
+        $this->entityManager->clear();
     }
 
 

@@ -68,10 +68,10 @@ class SwissZipTest extends KernelTestCase
         /** @var SwissZipManager $manager */
         $manager = $this->getContainer()->get(\whatwedo\SwissZip\Manager\SwissZipManager::class);
         $locations = $manager->suggest('orb');
-        $this->assertCount(15, $locations);
+        $this->assertCount(16, $locations);
         $this->assertEquals('Arnex-sur-Orbe', $locations[0]->getOrtbez27());
         $this->assertEquals('Morbio Superiore', $locations[7]->getOrtbez27());
-        $this->assertEquals('Worblaufen', $locations[14]->getOrtbez27());
+        $this->assertEquals('Worblaufen', $locations[15]->getOrtbez27());
     }
 
     public function testSuggest3000() {
