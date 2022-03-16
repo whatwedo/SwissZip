@@ -2,9 +2,9 @@
 
 namespace whatwedo\SwissZip\EventListener;
 
-use whatwedo\SwissZip\Entity\SwissZipTrait;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use whatwedo\SwissZip\Entity\SwissZipTrait;
 
 class SwissZipTraitListener implements EventSubscriber
 {

@@ -35,7 +35,6 @@ trait SwissZipTrait
     /**
      * @ORM\Column(type="string", length=2,  nullable=false)
      */
-
     protected string $kanton = '';
 
     /**
@@ -47,7 +46,6 @@ trait SwissZipTrait
      * @ORM\Column(type="smallint", nullable=false)
      */
     protected int $plzTyp = SwissZipInterface::PLZ_TYP_20;
-
 
     /**
      * @ORM\Column(type="date_immutable", nullable=false)
@@ -62,6 +60,7 @@ trait SwissZipTrait
     public function setOnrp(int $onrp): self
     {
         $this->onrp = $onrp;
+
         return $this;
     }
 
@@ -78,12 +77,14 @@ trait SwissZipTrait
     public function setPlzZz(string $plzZz): self
     {
         $this->plzZz = $plzZz;
+
         return $this;
     }
 
     public function setPostleitzahl(string $postleitzahl): self
     {
         $this->postleitzahl = $postleitzahl;
+
         return $this;
     }
 
@@ -95,6 +96,7 @@ trait SwissZipTrait
     public function setOrtbez18(string $ortbez18): self
     {
         $this->ortbez18 = $ortbez18;
+
         return $this;
     }
 
@@ -106,6 +108,7 @@ trait SwissZipTrait
     public function setOrtbez27(string $ortbez27): self
     {
         $this->ortbez27 = $ortbez27;
+
         return $this;
     }
 
@@ -117,6 +120,7 @@ trait SwissZipTrait
     public function setKanton(string $kanton): self
     {
         $this->kanton = $kanton;
+
         return $this;
     }
 
@@ -128,6 +132,7 @@ trait SwissZipTrait
     public function setSprachcode(int $sprachcode): self
     {
         $this->sprachcode = $sprachcode;
+
         return $this;
     }
 
@@ -139,6 +144,7 @@ trait SwissZipTrait
     public function setPlzTyp(int $plzTyp): self
     {
         $this->plzTyp = $plzTyp;
+
         return $this;
     }
 
@@ -150,6 +156,7 @@ trait SwissZipTrait
     public function setValidFrom(?\DateTimeImmutable $validFrom): self
     {
         $this->validFrom = $validFrom;
+
         return $this;
     }
 }
