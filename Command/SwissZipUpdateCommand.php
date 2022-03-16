@@ -22,9 +22,9 @@ class SwissZipUpdateCommand extends Command
 
     private EntityManagerInterface $entityManager;
 
-    public function __construct(string $name = null, SwissZipUpdateManager $swissZipManager, EntityManagerInterface $entityManager)
+    public function __construct(SwissZipUpdateManager $swissZipManager, EntityManagerInterface $entityManager)
     {
-        parent::__construct($name);
+        parent::__construct();
         $this->swissZipManager = $swissZipManager;
         $this->entityManager = $entityManager;
     }
