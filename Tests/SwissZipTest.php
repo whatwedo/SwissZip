@@ -14,7 +14,7 @@ class SwissZipTest extends KernelTestCase
         self::bootKernel();
     }
 
-    private function getRopo(): SwissZipRepository
+    private function getRepository(): SwissZipRepository
     {
         $entityManager = $this->getContainer()->get(EntityManagerInterface::class);
 
